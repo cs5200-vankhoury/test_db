@@ -1,115 +1,160 @@
 # test_db
-A sample database with an integrated test suite, used to test your applications and database servers
+
+A sample database with an integrated test suite, used to test your applications and database servers.
 
 This repository was migrated from [Launchpad](https://launchpad.net/test-db).
 
-See usage in the [MySQL docs](https://dev.mysql.com/doc/employee/en/index.html)
+See usage in the [MySQL docs](https://dev.mysql.com/doc/employee/en/index.html).
 
+## CS 5200 Version  
 
-## Where it comes from
+This version is prepared for **CS 5200 (Database Management Systems)** by **Ildar Akhmetov**. The setup includes instructions for deploying the database using Docker, aligning with the Docker environment used in the course.
 
-The original data was created by Fusheng Wang and Carlo Zaniolo at 
-Siemens Corporate Research. The data is in XML format.
-http://timecenter.cs.aau.dk/software.htm
+## Where it comes from  
 
-Giuseppe Maxia made the relational schema and Patrick Crews exported
-the data in relational format.
+The original data was created by **Fusheng Wang** and **Carlo Zaniolo** at Siemens Corporate Research. The data is in XML format:  
+[http://timecenter.cs.aau.dk/software.htm](http://timecenter.cs.aau.dk/software.htm).  
 
-The database contains about 300,000 employee records with 2.8 million 
-salary entries. The export data is 167 MB, which is not huge, but
-heavy enough to be non-trivial for testing.
+**Giuseppe Maxia** designed the relational schema, and **Patrick Crews** exported the data in relational format.  
 
-The data was generated, and as such there are inconsistencies and subtle
-problems. Rather than removing them, we decided to leave the contents
-untouched, and use these issues as data cleaning exercises.
+The database contains around **300,000 employee records** and **2.8 million salary entries**, resulting in a 167 MB export file. The data, though generated, includes inconsistencies that are left intentionally for educational data cleaning exercises.
 
-## Prerequisites
+## Prerequisites  
 
-You need a MySQL database server (5.0+) and run the commands below through a 
-user that has the following privileges:
+You need a **MySQL database server (5.0+)**. The instructions below assume you have MySQL installed and running, following the CS 5200 Docker instructions.
 
-    SELECT, INSERT, UPDATE, DELETE, 
-    CREATE, DROP, RELOAD, REFERENCES, 
-    INDEX, ALTER, SHOW DATABASES, 
-    CREATE TEMPORARY TABLES, 
-    LOCK TABLES, EXECUTE, CREATE VIEW
+Ensure the MySQL user executing the commands has the following privileges:
 
-## Installation:
+---
 
-1. Download the repository
-2. Change directory to the repository
+## Database Import Instructions
 
-Then run
+0. **Run the Container**  
 
-    mysql < employees.sql
+If you haven't already, start your local MySQL container:
 
+1. **Clone the Repository**  
 
-If you want to install with two large partitioned tables, run
+```bash
+gh repo clone cs5200-vankhoury/test_db
+cd test_db
+```
 
-    mysql < employees_partitioned.sql
+2. **Copy the SQL Files to the Container**  
 
+If you are in the directory containing the SQL dumps:
 
-## Testing the installation
+```bash
+docker cp . mysql-container:/tmp/
+```
 
-After installing, you can run one of the following
+This command copies the SQL files to the `/tmp/` directory inside the MySQL container.
 
-    mysql -t < test_employees_md5.sql
-    # OR
-    mysql -t < test_employees_sha.sql
+3. **Log in to the Container**  
 
-For example:
+Run the following command to log in to the container with bash:
 
-    mysql  -t < test_employees_md5.sql
-    +----------------------+
-    | INFO                 |
-    +----------------------+
-    | TESTING INSTALLATION |
-    +----------------------+
-    +--------------+------------------+----------------------------------+
-    | table_name   | expected_records | expected_crc                     |
-    +--------------+------------------+----------------------------------+
-    | employees    |           300024 | 4ec56ab5ba37218d187cf6ab09ce1aa1 |
-    | departments  |                9 | d1af5e170d2d1591d776d5638d71fc5f |
-    | dept_manager |               24 | 8720e2f0853ac9096b689c14664f847e |
-    | dept_emp     |           331603 | ccf6fe516f990bdaa49713fc478701b7 |
-    | titles       |           443308 | bfa016c472df68e70a03facafa1bc0a8 |
-    | salaries     |          2844047 | fd220654e95aea1b169624ffe3fca934 |
-    +--------------+------------------+----------------------------------+
-    +--------------+------------------+----------------------------------+
-    | table_name   | found_records    | found_crc                        |
-    +--------------+------------------+----------------------------------+
-    | employees    |           300024 | 4ec56ab5ba37218d187cf6ab09ce1aa1 |
-    | departments  |                9 | d1af5e170d2d1591d776d5638d71fc5f |
-    | dept_manager |               24 | 8720e2f0853ac9096b689c14664f847e |
-    | dept_emp     |           331603 | ccf6fe516f990bdaa49713fc478701b7 |
-    | titles       |           443308 | bfa016c472df68e70a03facafa1bc0a8 |
-    | salaries     |          2844047 | fd220654e95aea1b169624ffe3fca934 |
-    +--------------+------------------+----------------------------------+
-    +--------------+---------------+-----------+
-    | table_name   | records_match | crc_match |
-    +--------------+---------------+-----------+
-    | employees    | OK            | ok        |
-    | departments  | OK            | ok        |
-    | dept_manager | OK            | ok        |
-    | dept_emp     | OK            | ok        |
-    | titles       | OK            | ok        |
-    | salaries     | OK            | ok        |
-    +--------------+---------------+-----------+
+```bash
+docker exec -it mysql-container bash
+```
 
+4. **Execute the Main SQL Dump**
 
-## DISCLAIMER
+Inside the container, navigate to the `/tmp` directory and import the primary database dump:
 
-To the best of my knowledge, this data is fabricated and
-it does not correspond to real people. 
-Any similarity to existing people is purely coincidental.
+```bash
+cd /tmp
+mysql -t -u root -p < employees.sql
+```
 
+Enter the MySQL root password when prompted.
 
-## LICENSE
-This work is licensed under the 
-Creative Commons Attribution-Share Alike 3.0 Unported License. 
-To view a copy of this license, visit 
-http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to 
-Creative Commons, 171 Second Street, Suite 300, San Francisco, 
-California, 94105, USA.
+Import should take some time from a few seconds to a few minutes, depending on your system.
 
+You should expect to see the output similar to the following (where the time may vary):
 
+```
+INFO
+CREATING DATABASE STRUCTURE
+INFO
+storage engine: InnoDB
+INFO
+LOADING departments
+INFO
+LOADING employees
+INFO
+LOADING dept_emp
+INFO
+LOADING dept_manager
+INFO
+LOADING titles
+INFO
+LOADING salaries
+data_load_time_diff
+00:00:18
+```
+
+---
+
+## Testing the Installation  
+
+After installing, you can verify the setup by running one of the test scripts inside the container.
+
+```bash
+mysql -t -u root -p < test_employees_sha.sql
+```
+
+Alternatively:
+
+```bash
+mysql -t -u root -p < test_employees_md5.sql
+```
+
+If successful, you should see the following output:
+
+```
++----------------------+  
+| INFO                 |  
++----------------------+  
+| TESTING INSTALLATION |  
++----------------------+  
+```
+
+And a matching table summary with **OK** status for all tables:
+
+```
++--------------+---------------+-----------+
+| table_name   | records_match | crc_match |
++--------------+---------------+-----------+
+| employees    | OK            | ok        |
+| departments  | OK            | ok        |
+| dept_manager | OK            | ok        |
+| dept_emp     | OK            | ok        |
+| titles       | OK            | ok        |
+| salaries     | OK            | ok        |
++--------------+---------------+-----------+
+```
+
+---
+
+## Original Project Credits  
+
+This database and dataset were created by **Fusheng Wang** and **Carlo Zaniolo**. The relational schema was built by **Giuseppe Maxia**, and the data was exported to relational format by **Patrick Crews**.  
+
+The original project was hosted at [Launchpad](https://launchpad.net/test-db), with further documentation available in the [MySQL Employee Sample Database](https://dev.mysql.com/doc/employee/en/index.html).  
+
+---
+
+## DISCLAIMER  
+
+To the best of our knowledge, this data is **fabricated** and does not represent real individuals. Any similarities to actual persons are purely coincidental.
+
+---
+
+## LICENSE  
+
+This work is licensed under the [Creative Commons Attribution-Share Alike 3.0 Unported License](http://creativecommons.org/licenses/by-sa/3.0/).  
+
+---
+
+This version is tailored for use in **CS 5200 at Northeastern University**. Please follow the Docker-specific instructions above for installation and testing within the course framework.
