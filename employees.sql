@@ -21,6 +21,8 @@
 --  it does not correspond to real people. 
 --  Any similarity to existing people is purely coincidental.
 -- 
+--  Changed on Oct 20, 2024 by Ildar Akhmetov for educational purposes
+-- 
 
 DROP DATABASE IF EXISTS employees;
 CREATE DATABASE IF NOT EXISTS employees;
@@ -44,44 +46,33 @@ CREATE TABLE employees (
     first_name  VARCHAR(14)     NOT NULL,
     last_name   VARCHAR(16)     NOT NULL,
     gender      ENUM ('M','F')  NOT NULL,    
-    hire_date   DATE            NOT NULL,
-    PRIMARY KEY (emp_no)
+    hire_date   DATE            NOT NULL
 );
 
 CREATE TABLE departments (
     dept_no     CHAR(4)         NOT NULL,
-    dept_name   VARCHAR(40)     NOT NULL,
-    PRIMARY KEY (dept_no),
-    UNIQUE  KEY (dept_name)
+    dept_name   VARCHAR(40)     NOT NULL
 );
 
 CREATE TABLE dept_manager (
    emp_no       INT             NOT NULL,
    dept_no      CHAR(4)         NOT NULL,
    from_date    DATE            NOT NULL,
-   to_date      DATE            NOT NULL,
-   FOREIGN KEY (emp_no)  REFERENCES employees (emp_no)    ON DELETE CASCADE,
-   FOREIGN KEY (dept_no) REFERENCES departments (dept_no) ON DELETE CASCADE,
-   PRIMARY KEY (emp_no,dept_no)
+   to_date      DATE            NOT NULL
 ); 
 
 CREATE TABLE dept_emp (
     emp_no      INT             NOT NULL,
     dept_no     CHAR(4)         NOT NULL,
     from_date   DATE            NOT NULL,
-    to_date     DATE            NOT NULL,
-    FOREIGN KEY (emp_no)  REFERENCES employees   (emp_no)  ON DELETE CASCADE,
-    FOREIGN KEY (dept_no) REFERENCES departments (dept_no) ON DELETE CASCADE,
-    PRIMARY KEY (emp_no,dept_no)
+    to_date     DATE            NOT NULL
 );
 
 CREATE TABLE titles (
     emp_no      INT             NOT NULL,
     title       VARCHAR(50)     NOT NULL,
     from_date   DATE            NOT NULL,
-    to_date     DATE,
-    FOREIGN KEY (emp_no) REFERENCES employees (emp_no) ON DELETE CASCADE,
-    PRIMARY KEY (emp_no,title, from_date)
+    to_date     DATE
 ) 
 ; 
 
@@ -89,9 +80,7 @@ CREATE TABLE salaries (
     emp_no      INT             NOT NULL,
     salary      INT             NOT NULL,
     from_date   DATE            NOT NULL,
-    to_date     DATE            NOT NULL,
-    FOREIGN KEY (emp_no) REFERENCES employees (emp_no) ON DELETE CASCADE,
-    PRIMARY KEY (emp_no, from_date)
+    to_date     DATE            NOT NULL
 ) 
 ; 
 
